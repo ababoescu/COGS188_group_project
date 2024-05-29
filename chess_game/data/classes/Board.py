@@ -100,16 +100,18 @@ class Board:
 	def handle_click(self, mx, my):
 		x = mx // self.square_width
 		y = my // self.square_height
-		clicked_square = self.get_square_from_pos((x, y))
+		clicked_square = self.get_square_from_pos((x, y)) #gets the current position of the piece
 
 		if self.selected_piece is None:
 			if clicked_square.occupying_piece is not None:
 				if clicked_square.occupying_piece.color == self.turn:
-					self.selected_piece = clicked_square.occupying_piece
+					self.selected_piece = clicked_square.occupying_piece #if piece selected is color of player, can play that piece
 
+		#move piece at selected area
 		elif self.selected_piece.move(self, clicked_square):
 			self.turn = 'white' if self.turn == 'black' else 'black'
 
+		#confirming its your piece lol?
 		elif clicked_square.occupying_piece is not None:
 			if clicked_square.occupying_piece.color == self.turn:
 				self.selected_piece = clicked_square.occupying_piece
