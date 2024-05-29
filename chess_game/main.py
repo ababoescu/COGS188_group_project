@@ -64,7 +64,27 @@ else:
             if event.type == pygame.MOUSEBUTTONDOWN and turn == 0: #player 1's turn (HUMAN)
                 board.handle_click(mx, my) 
 
-                
+#while running:
+    #if player_turn == 'black':  # Assuming AI is playing as black
+        #best_move = find_best_move(board, 3, False)
+        #board.make_move(best_move)
+        #player_turn = 'white'
+
+    #mx, my = pygame.mouse.get_pos()
+    #for event in pygame.event.get():
+        #if event.type == pygame.QUIT:
+            #running = False
+        #elif event.type == pygame.MOUSEBUTTONDOWN:
+            #if event.button == 1 and player_turn == 'white':
+                #if board.handle_click(mx, my):
+                    #player_turn = 'black'
+
+    #if board.is_in_checkmate('black'):
+        #print('White wins!')
+        #running = False
+    #elif board.is_in_checkmate('white'):
+        #print('Black wins!')
+        #running = False
                 
 
 
