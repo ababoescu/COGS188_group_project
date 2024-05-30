@@ -196,3 +196,10 @@ class Board:
 
 		for square in self.squares:
 			square.draw(display)
+
+	# get optimal piece, to implement minimax : 
+	def get_moves(self, best_move):
+		pass 
+	def optimal_piece(self): #? s
+		#find the optimal piece and assign it to selected_piece 
+		pass

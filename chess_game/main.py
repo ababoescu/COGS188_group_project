@@ -9,7 +9,7 @@ from data.classes.Board import Board
 
 #parser for choosing the game type
 parser = argparse.ArgumentParser()
-parser.add_argument("game_type', help='Type of game: 'human' or 'ai'", choices=["human", "ai"])
+parser.add_argument("game_type", help="Type of game: 'human' or 'ai'", choices=["human", "ai"])
 args = parser.parse_args()
 
 # Initialize Pygame
@@ -54,6 +54,10 @@ if args.game_type == "human":
 #Human vs AI
 else:
     while running:
+        if turn == 'black':
+             best_move = find_best_move(board, 3, False)
+             board.selected_piece.move(best_move)
+             turn = 'white'
         mx, my = pygame.mouse.get_pos() # mouse position on board possibly????
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -61,8 +65,17 @@ else:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     board.handle_click(mx, my)
-            if event.type == pygame.MOUSEBUTTONDOWN and turn == 0: #player 1's turn (HUMAN)
-                board.handle_click(mx, my) 
+            if event.type == pygame.MOUSEBUTTONDOWN and turn == 'white': #player 1's turn (HUMAN)
+                if board.handle_click(mx, my): 
+                     turn = 'black' #now black piece turn
+
+        if board.is_in_checkmate('black'):
+            print('White wins!')
+            running = False
+        elif board.is_in_checkmate('white'):
+            print('Black wins!')
+            running = False         
+            
 
 #while running:
     #if player_turn == 'black':  # Assuming AI is playing as black
@@ -119,8 +132,8 @@ def minimax(board, depth, alpha, beta, is_maximizing_player):
 def find_best_move(board, depth, is_maximizing_player):
     best_move = None
     best_value = float('-inf') if is_maximizing_player else float('inf')
-
-    for move in board.generate_legal_moves('maximizing_player' if is_maximizing_player else 'minimizing_player'):
+    #figure how to find the piece with the optimal move
+    for move in board.selected_piece.get_valid_moves('maximizing_player' if is_maximizing_player else 'minimizing_player'):
         new_board = board.make_move(move)
         board_value = minimax(new_board, depth - 1, float('-inf'), float('inf'), not is_maximizing_player)
 
