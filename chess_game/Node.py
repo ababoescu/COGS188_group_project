@@ -35,7 +35,7 @@ def rollout(curr_node):
         else:
             return (0.5, curr_node)
         
-    all_moves = [curr_node.state.san(i) for i in list(curr_node.state.legal_move)]
+    all_moves = [curr_node.state.san(i) for i in list(curr_node.state.legal_moves)]
 
     for i in all_moves:
         tmp_state = chess.Board(curr_node.state.fen())
