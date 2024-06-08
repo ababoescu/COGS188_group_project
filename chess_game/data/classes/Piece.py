@@ -1,6 +1,11 @@
 import pygame
 
 class Piece:
+
+	pieces_eaten_history = []
+	has_moved_history = []
+	position_history = []
+
 	def __init__(self, pos, color, board):
 		self.pos = pos
 		self.x = pos[0]
@@ -75,3 +80,38 @@ class Piece:
 	# True for all pieces except pawn
 	def attacking_squares(self, board):
 		return self.get_moves(board)
+	
+	# get the last eaten piece
+	def get_last_eaten_piece(self):
+		return self.pieces_eaten_history.pop()
+	
+	# add the last eaten piece to array
+	def set_last_eaten_piece(self, piece):
+		self.pieces_eaten_history.append(piece)
+
+
+	# update history of piece's position
+	def set_position(self, x, y, keep_history):
+		if keep_history:
+			self.position_history.append(self.x)
+			self.position_history.append(self.y)
+			self.has_moved_history.append(self.has_moved)
+		self.x = x
+		self.y = y
+		self.has_moved = True
+
+	def set_past_position(self):
+		pos_y = self.position_history.pop()
+		pos_x = self.position_history.pop()
+		self.x = pos_x
+		self.y = pos_y
+		self.has_moved = self.has_moved_history.pop()
+
+	
+	# get the score of the piece
+	def get_score(self):
+		return 0
+	
+
+
+		

@@ -81,4 +81,8 @@ class Queen(Piece):
 		output.append(moves_nw)
 
 		return output
+	
+	def get_score(self):
+		return 250
+	
 

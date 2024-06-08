@@ -14,8 +14,8 @@ class Square:
 		self.color = 'light' if (x + y) % 2 == 0 else 'dark'
 		self.draw_color = (241, 211, 170) if self.color == 'light' else (180, 126, 82)
 		self.highlight_color = (150, 255, 100) if self.color == 'light' else (50, 220, 0)
-		self.occupying_piece = None
-		self.coord = self.get_coord()
+		self.occupying_piece = None #get piece
+		self.coord = self.get_coord() #get coordinate
 		self.highlight = False
 
 		self.rect = pygame.Rect(

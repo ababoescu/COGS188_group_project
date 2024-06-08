@@ -41,3 +41,6 @@ class Knight(Piece):
 				])
 
 		return output
+
+	def get_score(self):
+		return 20

@@ -84,4 +84,8 @@ class Pawn(Piece):
 		moves = self.get_moves(board)
 		# return the diagonal moves 
 		return [i for i in moves if i.x != self.x]
+	
+	# the score you get you getting the piece
+	def get_score(self):
+		return 10
 

@@ -94,3 +94,6 @@ class King(Piece):
 			)
 
 		return output
+
+	def get_score(self):
+		return 1000

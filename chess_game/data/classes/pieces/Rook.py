@@ -45,3 +45,6 @@ class Rook(Piece):
 		output.append(moves_west)
 
 		return output
+	
+	def get_score(self):
+		return 30
