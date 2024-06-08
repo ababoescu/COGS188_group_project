@@ -1,10 +1,25 @@
+import pygame
 import chess
 import chess.pgn
 import chess.engine
+import chess.svg
 import random
 import time
 import heapq
 from math import log, sqrt, e, inf
+#from gymnasium.wrappers import RecordVideo
+
+# for the gif
+from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt 
+from matplotlib.pyplot import colormaps
+import matplotlib.image as mpimg
+import os
+from PIL import Image
+import numpy as np
+
+
+
 
 depth = 0
 
@@ -156,7 +171,7 @@ def mcts_pred(curr_node, over, white, iterations=10):
 
 # Main Function
 board = chess.Board()
-#engine
+
 
 white = 1
 moves = 0
@@ -165,9 +180,17 @@ game = chess.pgn.Game()
 evalutations = []
 sm = 0
 cnt = 0
+
+
+
+# store each board state as an image
+board_states = []
+
 while((not board.is_game_over())):
     all_moves = [board.san(i) for i in list(board.legal_moves)]
-
+    print('')
+    print(board)
+    print('')
     root = Node()
     root.state = board
     result = mcts_pred(root, board.is_game_over(), white)
@@ -175,9 +198,16 @@ while((not board.is_game_over())):
     board.push_san(result)
 
     pgn.append(result)
-    white ^= 1
+    white ^= 1 # allows to switch between 2 different states black and white
+
+    # Save the current board state
+    board_states.append(board.copy())
 
     moves += 1
+
+
+board_states.append(board.copy())
+
 
 print(board)
 print(' '.join(pgn))
@@ -185,5 +215,38 @@ print()
 print(board.result())
 game.headers['Result'] = board.result()
 
-game.quit()
+# Load unicode 
+pieces_unicode = {
+    "P": "♙", "R": "♖", "N": "♘", "B": "♗", "Q": "♕", "K": "♔",
+    "p": "♟", "r": "♜", "n": "♞", "b": "♝", "q": "♛", "k": "♚" 
+}
+
+# Create animation using FuncAnimation (from L6)
+fig, ax = plt.subplots()
+
+def plot_board(board, ax):
+    ax.clear()
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.imshow([[1, 0] * 4, [0, 1] * 4] * 4, cmap='gray', alpha=0.3) # gray and white
+    #ax.imshow([[1, 0] * 4, [0, 1] * 4] * 4, cmap='viridis', alpha=0.3) # this gives yellow and purple
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        if piece:
+            #color = 'w' if piece.color == chess.WHITE else 'b'
+            piece_unicode = pieces_unicode[piece.symbol()]
+            ax.text(square % 8, 7- square // 8, piece_unicode, fontsize = 36, ha='center', va='center')
+            #ax.text(square % 8, 7- square // 8, piece.symbol(), fontsize = 36, ha='center', va='center', color=color)
+
+
+def update(frame):
+    plot_board(board_states[frame], ax)
+
+animation = FuncAnimation(fig, update, frames=len(board_states), repeat=False)
+animation.save('chess_game.gif', writer='pillow', fps=1)
+plt.close(fig)
+
+
+
+
 

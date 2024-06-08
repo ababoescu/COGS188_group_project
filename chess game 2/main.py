@@ -1,14 +1,17 @@
 import pygame
 
 from data.classes.Board import Board
+from Node import *
 
-pygame.init()
+pygame.init() # game is being initialized
 
+# screen and board is being printed
 WINDOW_SIZE = (1000, 1000)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 
 board = Board(WINDOW_SIZE[0], WINDOW_SIZE[1])
 
+# drawing  the board
 def draw(display):
 	display.fill('white')
 
@@ -16,7 +19,7 @@ def draw(display):
 
 	pygame.display.update()
 
-
+# While the game is running
 running = True
 while running:
 	mx, my = pygame.mouse.get_pos()
