@@ -90,13 +90,14 @@ def expand(curr_node, white):
                 sel_child = i
         return expand(sel_child, 1)
     
-
+rewards =[]
 def rollback(curr_node, reward):
     curr_node.n += 1
     curr_node.v += reward
     while (curr_node.parent != None):
         curr_node.N += 1
         curr_node = curr_node.parent
+    rewards.append(reward)
     return curr_node
 
 def mcts_pred(curr_node, over, white, iterations=10):
@@ -261,5 +262,16 @@ plt.close(fig)
 
 
 
+plt.figure(figsize=(8,8))
+plt.plot(range(len(rewards)), rewards, marker='o', linestyle='-', color='b')
+plt.title('Reward Count vs Moves')
+plt.xlabel('Time (moves)')
+plt.ylabel('Reward')
+#plt.grid(True)
 
+
+# Plot rewards
+#fig, ax = plt.subplots()
+#plot_reward(plt, rewards)
+plt.show()
 
