@@ -124,23 +124,15 @@ def expand(curr_node, white):
                 sel_child = i
         return expand(sel_child, 1)
     
-<<<<<<< Updated upstream
-rewards =[]
-=======
 rewards = [] # list that stores rewards
 
->>>>>>> Stashed changes
 def rollback(curr_node, reward):
     curr_node.n += 1
     curr_node.v += reward
     while (curr_node.parent != None):
         curr_node.N += 1
         curr_node = curr_node.parent
-<<<<<<< Updated upstream
-    rewards.append(reward)
-=======
     rewards.append(reward) # Append the reward to the list
->>>>>>> Stashed changes
     return curr_node
 
 def mcts_pred(curr_node, over, white, iterations=500): #updated iterations from 10 to 100
@@ -316,15 +308,6 @@ animation.save('chess_game.gif', writer='pillow', fps=1)
 plt.close(fig)
 
 
-<<<<<<< Updated upstream
-
-plt.figure(figsize=(8,8))
-plt.plot(range(len(rewards)), rewards, marker='o', linestyle='-', color='b')
-plt.title('Reward Count vs Moves')
-plt.xlabel('Time (moves)')
-plt.ylabel('Reward')
-#plt.grid(True)
-=======
 plt.figure(figsize=(10, 6))
 plt.plot(rewards, marker='o')
 plt.title('Updating Rewards Over the Game')
@@ -332,11 +315,5 @@ plt.xlabel('Move Number')
 plt.ylabel('Reward')
 plt.grid(True)
 plt.show()
->>>>>>> Stashed changes
 
-
-# Plot rewards
-#fig, ax = plt.subplots()
-#plot_reward(plt, rewards)
-plt.show()
 
