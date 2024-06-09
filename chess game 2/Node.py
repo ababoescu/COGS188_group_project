@@ -36,11 +36,30 @@ class Node():
     def __lt__(self, other):
         return self.ucb < other.ucb
 def ucb1(curr_node):
-    ans = curr_node.v+2*(sqrt(log(curr_node.N+e+(10**-6))/(curr_node.n+(10**-10))))
+    ans = curr_node.v + 2 * (sqrt(log(curr_node.N + e + (10 ** -6))/(curr_node.n + (10 ** -10))))
     return ans
 
-def rollout(curr_node):
+def evaluate_board(board):
+    piece_values = {
+        chess.PAWN: 1,
+        chess.KNIGHT: 3,
+        chess.BISHOP: 3,
+        chess.ROOK: 5,
+        chess.QUEEN: 10,
+        chess.KING: 0
+    }
+    value = 0
+    for piece_type in piece_values:
+        value += len(board.pieces(piece_type, chess.WHITE)) * piece_values[piece_type]
+        value -= len(board.pieces(piece_type, chess.BLACK)) * piece_values[piece_type]
+    return value
 
+
+
+
+
+def rollout(curr_node):
+    """
     if(curr_node.state.is_game_over()):
         board = curr_node.state 
         if (board.result() == '1-0'):
@@ -62,6 +81,21 @@ def rollout(curr_node):
     rnd_state = random.choice(list(curr_node.children))
 
     return rollout(rnd_state)
+
+    """
+    board = curr_node.state 
+    if board.is_game_over():
+        result = board.result()
+        if result == '1-0':
+            return 1
+        elif result == '0-1':
+            return -1
+        else:
+            return 0
+    return evaluate_board(board) / 100
+
+
+    
 
 def expand(curr_node, white):
     if (len(curr_node.children) == 0):
@@ -90,17 +124,26 @@ def expand(curr_node, white):
                 sel_child = i
         return expand(sel_child, 1)
     
+<<<<<<< Updated upstream
 rewards =[]
+=======
+rewards = [] # list that stores rewards
+
+>>>>>>> Stashed changes
 def rollback(curr_node, reward):
     curr_node.n += 1
     curr_node.v += reward
     while (curr_node.parent != None):
         curr_node.N += 1
         curr_node = curr_node.parent
+<<<<<<< Updated upstream
     rewards.append(reward)
+=======
+    rewards.append(reward) # Append the reward to the list
+>>>>>>> Stashed changes
     return curr_node
 
-def mcts_pred(curr_node, over, white, iterations=10):
+def mcts_pred(curr_node, over, white, iterations=500): #updated iterations from 10 to 100
     if(over):
         return -1
     all_moves = [curr_node.state.san(i) for i in list(curr_node.state.legal_moves)]
@@ -128,8 +171,10 @@ def mcts_pred(curr_node, over, white, iterations=10):
                     sel_child = i
 
             ex_child = expand(sel_child, 0)
-            reward, state = rollout(ex_child)
-            curr_node = rollback(state, reward)
+            #reward, state = rollout(ex_child)
+            reward = rollout(ex_child)
+            #curr_node = rollback(state, reward)
+            curr_node = rollback(ex_child, reward)
             iterations -= 1
         else:
             idx = -1
@@ -143,8 +188,10 @@ def mcts_pred(curr_node, over, white, iterations=10):
                     sel_child = i
 
             ex_child = expand(sel_child, 1)
-            reward, state = rollout(ex_child)
-            curr_node = rollback(state, reward)
+            #reward, state = rollout(ex_child)
+            reward = rollout(ex_child)
+            #curr_node = rollback(state, reward)
+            curr_node = rollback(ex_child, reward)
             iterations -= 1
         
         if(white):
@@ -190,34 +237,43 @@ cnt = 0
 
 # store each board state as an image
 board_states = []
-
+#root = Node()
 while((not board.is_game_over())):
-    all_moves = [board.san(i) for i in list(board.legal_moves)]
-    print('')
-    print(board)
-    print('')
-    root = Node()
-    root.state = board
-    result = mcts_pred(root, board.is_game_over(), white)
+    if white == 1:
+        all_moves = [board.san(i) for i in list(board.legal_moves)]
+        print('It is white turn')
+        print('')
+        print(board)
+        print('')
 
-    board.push_san(result)
+        root = Node()
+        #curr_node = Node()
+        root.state = board
+        #curr_node.state = board
+        result = mcts_pred(root, board.is_game_over(), white, iterations = 500) # added in iterations = 100
 
-    pgn.append(result)
-    white ^= 1 # allows to switch between 2 different states black and white
+        board.push_san(result)
 
-    # Save the current board state
-    board_states.append(board.copy())
-    moves += 1
+        pgn.append(result)
+        white ^= 1 # allows to switch between 2 different states black and white
 
-    all_moves = [board.san(i) for i in list(board.legal_moves)]
-    root = Node()
-    root.state = board
-    result = getRandomLegalMove(root)
-    board.push_san(result)
-    pgn.append(result)
-    white ^= 1 
-    board_states.append(board.copy())
-    moves += 1
+        # Save the current board state
+        board_states.append(board.copy())
+        moves += 1
+    else:
+        all_moves = [board.san(i) for i in list(board.legal_moves)]
+        print('It is black turn')
+        print('')
+        print(board)
+        print('')
+        root = Node()
+        root.state = board
+        result = getRandomLegalMove(root)
+        board.push_san(result)
+        pgn.append(result)
+        white ^= 1 
+        board_states.append(board.copy())
+        moves += 1
 
 
 board_states.append(board.copy())
@@ -247,10 +303,9 @@ def plot_board(board, ax):
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece:
-            #color = 'w' if piece.color == chess.WHITE else 'b'
             piece_unicode = pieces_unicode[piece.symbol()]
             ax.text(square % 8, 7- square // 8, piece_unicode, fontsize = 36, ha='center', va='center')
-            #ax.text(square % 8, 7- square // 8, piece.symbol(), fontsize = 36, ha='center', va='center', color=color)
+
 
 
 def update(frame):
@@ -261,6 +316,7 @@ animation.save('chess_game.gif', writer='pillow', fps=1)
 plt.close(fig)
 
 
+<<<<<<< Updated upstream
 
 plt.figure(figsize=(8,8))
 plt.plot(range(len(rewards)), rewards, marker='o', linestyle='-', color='b')
@@ -268,6 +324,15 @@ plt.title('Reward Count vs Moves')
 plt.xlabel('Time (moves)')
 plt.ylabel('Reward')
 #plt.grid(True)
+=======
+plt.figure(figsize=(10, 6))
+plt.plot(rewards, marker='o')
+plt.title('Updating Rewards Over the Game')
+plt.xlabel('Move Number')
+plt.ylabel('Reward')
+plt.grid(True)
+plt.show()
+>>>>>>> Stashed changes
 
 
 # Plot rewards
