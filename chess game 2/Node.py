@@ -168,6 +168,10 @@ def mcts_pred(curr_node, over, white, iterations=10):
             return selected_move
         
 
+def getRandomLegalMove(curr_node):
+    legal_moves = list(curr_node.state.legal_moves)
+    rand = random.randrange(len(legal_moves))
+    return board.san(legal_moves[rand])
 
 # Main Function
 board = chess.Board()
@@ -202,7 +206,16 @@ while((not board.is_game_over())):
 
     # Save the current board state
     board_states.append(board.copy())
+    moves += 1
 
+    all_moves = [board.san(i) for i in list(board.legal_moves)]
+    root = Node()
+    root.state = board
+    result = getRandomLegalMove(root)
+    board.push_san(result)
+    pgn.append(result)
+    white ^= 1 
+    board_states.append(board.copy())
     moves += 1
 
 
