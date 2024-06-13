@@ -51,10 +51,11 @@ def evaluate_board(board):
         value -= len(board.pieces(piece_type, chess.BLACK)) * piece_values[piece_type]
     return value
 
-def rollout(curr_node, depth_limit=10):
+def rollout(curr_node, reward):
     board = curr_node.state 
     depth = 0
-    while not board.is_game_over() and depth < depth_limit:
+    captured_piece = None
+    while not board.is_game_over():
         legal_moves = list(board.legal_moves)
         move_weights = []
         for move in legal_moves:
@@ -67,18 +68,35 @@ def rollout(curr_node, depth_limit=10):
         else:
             probabilities = [weight / total_weight for weight in move_weights]
             move = random.choices(legal_moves, probabilities)[0]
+        if board.is_capture(move):
+            if board.is_en_passant(move):
+                captured_piece = chess.PAWN
+            else:
+                captured_piece = board.piece_at(move.to_square).piece_type
+        if captured_piece is not None and depth == 0:
+            if captured_piece == chess.PAWN:
+                reward += 1
+            elif captured_piece == chess.KNIGHT:
+                reward += 3
+            elif captured_piece == chess.BISHOP:
+                reward += 3
+            elif captured_piece == chess.ROOK:
+                reward += 5
+            elif captured_piece == chess.QUEEN:
+                reward += 9
         board.push(move)
         depth += 1
 
     if board.is_game_over():
         result = board.result()
         if result == '1-0':
-            return 1
+            return reward + 10
         elif result == '0-1':
-            return -1
+            return reward - 10
         else:
-            return 0
-    return evaluate_board(board) / 100
+            return reward
+    return rollout(curr_node, reward)
+    #return evaluate_board(board) / 100
 
 def expand(curr_node, white):
     if len(curr_node.children) == 0:
@@ -113,7 +131,7 @@ def rollback(curr_node, reward):
     rewards.append(reward) # Append the reward to the list
     return curr_node
 
-def mcts_pred(curr_node, over, white, iterations=500): #updated iterations from 10 to 100
+def mcts_pred(curr_node, over, white, iterations=5000): #updated iterations from 10 to 100
     if over:
         return -1
     all_moves = [curr_node.state.san(i) for i in list(curr_node.state.legal_moves)]
@@ -139,7 +157,7 @@ def mcts_pred(curr_node, over, white, iterations=500): #updated iterations from 
                     sel_child = i
 
             ex_child = expand(sel_child, 0)
-            reward = rollout(ex_child)
+            reward = rollout(ex_child, 0)
             curr_node = rollback(ex_child, reward)
             iterations -= 1
         else:
@@ -260,11 +278,18 @@ def update(frame):
     plot_board(board_states[frame], ax)
 
 animation = FuncAnimation(fig, update, frames=len(board_states), repeat=False)
-animation.save('chess_game_2.gif', writer='pillow', fps=1)
+animation.save('chess_game_2.gif', writer='pillow', fps=3)
 plt.close(fig)
 
+cumulative_rewards = []
+sum = 0
+for val in rewards:
+    sum += val
+    cumulative_rewards.append(sum)
+
+
 plt.figure(figsize=(10, 6))
-plt.plot(rewards, marker='o')
+plt.plot(cumulative_rewards, marker='o')
 plt.title('Updating Rewards Over the Game')
 plt.xlabel('Move Number')
 plt.ylabel('Reward')
